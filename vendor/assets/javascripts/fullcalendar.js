@@ -2631,8 +2631,10 @@ var DragListener = FC.DragListener = Class.extend(ListenerMixin, MouseIgnorerMix
 	startDrag: function(ev, extraOptions) {
 		this.startInteraction(ev, extraOptions); // ensure interaction began
 
+
+
 		if (!this.isDragging) {
-			this.isDragging = true;
+			this.isDragging = false;
 			this.handleDragStart(ev);
 		}
 	},
@@ -6202,11 +6204,11 @@ DayGrid.mixin({
 						) +
 				'</div>' +
 				(isResizableFromStart ?
-					'<div class="fc-resizer fc-start-resizer" />' :
+					'<div class="fc-resizer " />' :
 					''
 					) +
 				(isResizableFromEnd ?
-					'<div class="fc-resizer fc-end-resizer" />' :
+					'<div class="fc-resizer " />' :
 					''
 					) +
 			'</a>';
@@ -6679,7 +6681,7 @@ DayGrid.mixin({
 		var i;
 
 		// render each seg's `el` and only return the visible segs
-		segs = this.renderFgSegEls(segs, true); // disableResizing=true
+		segs = this.renderFgSegEls(segs, true);  //disableResizing=true;
 		this.popoverSegs = segs;
 
 		for (i = 0; i < segs.length; i++) {

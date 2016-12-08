@@ -47,45 +47,45 @@ class AppointmentsController < ApplicationController
         format.html {redirect_to @appointment, notice: 'Appointment was successfully updated.' }
         format.json {head :no_content }
             if @appointment.update(status_params)
-              
+
                 if @appointment.status == "Confirm"
-              
-                    for i in  0..100 do  
+
+                    for i in  0..100 do
                         if @appointment.users_id == i
                           AppointmentMailer.confirm_appointment(User.find(i), @appointment.created_at, @appointment.status).deliver_now
-                            
+                          Event.create(:users_id => current_user.id, :title => "Your have appointment with: " +  @appointment.firstname + " " +  @appointment.lastname, :start => @appointment.date, :end => @appointment.date+30.minutes, :color => "green") 
                         else
-                          
-                        end 
-                        
+
+                        end
+
                     end
-                    for i in 0..100 do  
+                    for i in 0..100 do
                       if @appointment.id == i
                             AppointmentMailer.confirm_appointment_for_doctor(User.find_by_firstname(@appointment.firstname), @appointment.created_at, @appointment.status).deliver_now
-                      else 
-                        
+                      else
+
                       end
-                      
-                      
-                    end  
+
+
+                    end
                 elsif @appointment.status == "Pending"
-                  for i in  0..100 do  
+                  for i in  0..100 do
                         if @appointment.users_id == i
                           PatientMailer.make_appointment(User.find(i), @appointment.created_at, @appointment.status).deliver_now
-                            
+
                         else
-                          
-                        end 
-                        
+
+                        end
+
                   end
-                  
-                end  
-                
-                  
+
+                end
+
+
             else
-              
-            end  
-          
+
+            end
+
       else
         format.html {render action: 'edit' }
         format.json {render json: @appointment.errors, status: :unprocessable_entity }
@@ -109,25 +109,25 @@ class AppointmentsController < ApplicationController
 
 
    def checkstatus
-   end 
-   
-  
+   end
+
+
   def check
    @appointments = Appointment.where(:status => "Pending")
   end
-  
+
   def appointment
      @appointments = Appointment.where(:status => "")
   end
-  
+
   def confirmappointment
   end
 
- 
-  
-  
-  
-  
+
+
+
+
+
 
   private
     # Use callbacks to share common setup or constraints between actions.
@@ -139,9 +139,8 @@ class AppointmentsController < ApplicationController
     def appointment_params
       params.require(:appointment).permit(:id, :users_id, :date, :firstname, :lastname, :role, :specialty, :status)
     end
-    
+
     def status_params
       params.require(:appointment).permit(:status)
     end
 end
-

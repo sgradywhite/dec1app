@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161202085703) do
+ActiveRecord::Schema.define(version: 20161203094759) do
 
   create_table "appointments", force: :cascade do |t|
     t.integer  "users_id"
@@ -26,13 +26,30 @@ ActiveRecord::Schema.define(version: 20161202085703) do
     t.index ["users_id"], name: "index_appointments_on_users_id"
   end
 
+  create_table "event_reminders", force: :cascade do |t|
+    t.integer  "events_id"
+    t.integer  "users_id"
+    t.string   "twodaysreminder"
+    t.string   "samedayreminder"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.string   "status"
+    t.string   "start"
+    t.string   "end"
+    t.index ["events_id"], name: "index_event_reminders_on_events_id"
+    t.index ["users_id"], name: "index_event_reminders_on_users_id"
+  end
+
   create_table "events", force: :cascade do |t|
+    t.integer  "users_id"
     t.string   "title"
     t.datetime "start"
     t.datetime "end"
     t.string   "color"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string   "status"
+    t.index ["users_id"], name: "index_events_on_users_id"
   end
 
   create_table "mailboxer_conversation_opt_outs", force: :cascade do |t|

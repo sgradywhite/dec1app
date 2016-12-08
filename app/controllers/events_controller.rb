@@ -3,7 +3,13 @@ class EventsController < ApplicationController
 
 
   def index
+    if current_user.role == "office"
     @events = Event.where(start: params[:start]..params[:end])
+    elsif current_user.role == "patient"
+      @user_id = current_user.id
+        @events = (Event.where(:users_id => @user_id) | Event.where(:users_id => nil ))
+
+    end
   end
 
   def show
@@ -16,8 +22,8 @@ class EventsController < ApplicationController
 
   def edit
   end
-  
-  
+
+
 
   def create
     @event = Event.new(event_params)
@@ -26,13 +32,39 @@ class EventsController < ApplicationController
 
 
   def update
-    @event.update(event_params)
-    if @event.save
-          UserMailer.event_confirmation(@event.id, current_user).deliver_now
-          
-         
-    else
-    end  
+
+      if @event.update(event_params)
+
+        if @event.update(status_params)
+
+
+
+
+
+          if (EventReminder.where(:events_id => @event.id).blank?) && (EventReminder.where(:users_id => current_user.id).blank?)
+              EventReminder.create(:events_id => @event.id, :users_id => current_user.id, :status => "Confirm" , :start => @event.start, :end => @event.end)
+
+          elsif (EventReminder.where(:users_id => current_user.id).blank?) || (EventReminder.where(:events_id => @event.id).blank?)
+              EventReminder.create(:events_id => @event.id, :users_id => current_user.id, :status => "Confirm" , :start => @event.start, :end => @event.end)
+          elsif ((EventReminder.where(:users_id => current_user.id).present?) || (EventReminder.where(:events_id => @event.id).blank?))
+              EventReminder.create(:events_id => @event.id, :users_id => current_user.id, :status => "Confirm" , :start => @event.start, :end => @event.end)
+          elsif ((EventReminder.where(:users_id => current_user.id).blank?) || (EventReminder.where(:events_id => @event.id).present?))
+              EventReminder.create(:events_id => @event.id, :users_id => current_user.id, :status => "Confirm" , :start => @event.start, :end => @event.end)
+          elsif
+              redirect_to (patient_page_path)
+          end
+
+
+
+
+
+
+        else
+        end
+
+      else
+      end
+
   end
   def gotoeventcalendar
   end
@@ -47,6 +79,9 @@ class EventsController < ApplicationController
     end
 
     def event_params
-      params.require(:event).permit(:title, :date_range, :start, :end, :color)
+      params.require(:event).permit(:title, :date_range, :start, :end, :color, :status)
+    end
+    def status_params
+      params.require(:event).permit(:status)
     end
 end
